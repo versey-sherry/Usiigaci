@@ -12,7 +12,8 @@ import logging
 
 
 def read_img_sequence(path, file_extension):
-    pims_sequence = pims.ImageSequence(join(path, '*.{}'.format(file_extension)), process_func=None)
+    #pims_sequence = pims.ImageSequence(join(path, '*.{}'.format(file_extension)), process_func=None)
+    pims_sequence = pims.ImageSequence(join(path, '*.{}'.format(file_extension)))
     return np.stack([frame.copy() for frame in pims_sequence], axis=2)
 
 

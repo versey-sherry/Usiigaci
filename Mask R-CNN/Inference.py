@@ -71,7 +71,7 @@ class ImageDataset(utils.Dataset):
         """
         self.add_class("cell", 1, "cell")
 
-        image_ids = os.listdir(dataset_dir)
+        image_ids = [file for file in os.listdir(dataset_dir) if '.tif' in file]
 
         for image_id in image_ids:
             self.add_image(
@@ -107,7 +107,9 @@ def detect(model, data_dir, out_dir):
     # Load over images
     for image_id in tqdm(dataset.image_ids):
         # Load image and run detection
-        image = dataset.load_image(image_id)
+        #image = dataset.load_image(image_id)
+        #If error in inferring the image, check the encoding and make sure it is 16 bits
+        image = dataset.load_image(image_id) *16
         # Detect objects
         r = model.detect([image], verbose=0)[0]
         # Encode image to RLE. Returns a string of multiple lines
@@ -263,7 +265,7 @@ def postprocess(data_dir, out_dir):
     #os.makedirs(out_dir, exist_ok=True)
     models_dir = [os.path.join(data_dir, filename) for filename in os.listdir(data_dir)]
     print('Merging multiple models predictions.')
-    filenames = os.listdir(models_dir[0])
+    filenames = [file for file in os.listdir(models_dir[0]) if '.png' in file]
 
     for filename in tqdm(filenames):
         masks = [cv2.imread(os.path.join(model_dir, filename), 0) for model_dir in models_dir]
@@ -285,7 +287,7 @@ def postprocess(data_dir, out_dir):
 
 
 #define the folder path to data for prediction
-data_dir = '/media/davince/DATA_HD/Cell electrotaxis/20180603similarity_analysis/3T3Ctrl/' #don't forget the / at the end
+data_dir = 'cus_data_copy/' #don't forget the / at the end
 #model_path = '/home/davince/Dropbox (OIST)/Deeplearning_system/Mask-RCNN_OIST/trainednetwork/mask_rcnn_nuclei_res101.h5'
 
 #define the model weight paths
@@ -297,6 +299,7 @@ model_list = [model_path_1, model_path_2, model_path_3]
 #model_list = [model_path_1, model_path_2]
 # find all the subdirectory by first identifying all the directory in all levels, then add to a sub_directory list
 #the intended prediction files should be organized by experiments into sets in a main folder which will be the direc_name
+
 all_files = []
 sub_directory = []
 for root, dirs, files in os.walk(data_dir):
@@ -308,7 +311,7 @@ for root, dirs, files in os.walk(data_dir):
 all_files.sort(reverse=True)
 for (count, folder), files in groupby(all_files, itemgetter(0, 1)):
 	sub_directory.append(folder)
-#print(sub_directory)
+print(sub_directory)
 
 config = CellInferenceConfig()
 #model = modellib.MaskRCNN(mode="inference", config=config, model_dir=out_dir)
