@@ -52,14 +52,14 @@ logging class
 
 
 class Logger(object):
-	def __init__(self):
-		self.terminal = sys.stdout
-		self.log = open(data_dir+"log.log", "a")
-	def write(self, message):
-		self.terminal.write(message)
-		self.log.write(message)
-	def flush(self):
-		pass
+    def __init__(self):
+        self.terminal = sys.stdout
+        self.log = open(data_dir+"log.log", "a")
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+    def flush(self):
+        pass
 
 
 class ImageDataset(utils.Dataset):
@@ -99,17 +99,18 @@ def detect(model, data_dir, out_dir):
     detection_dir = "detections_{:%Y%m%dT%H%M%S}".format(datetime.datetime.now())
     detection_dir = os.path.join(out_dir, detection_dir)
     os.makedirs(detection_dir)
-	'''
+    '''
     # Read dataset
     dataset = ImageDataset()
     dataset.load_images(data_dir)
     dataset.prepare()
     # Load over images
+    print(dataset.image_ids)
     for image_id in tqdm(dataset.image_ids):
+        print(image_id)
         # Load image and run detection
-        #image = dataset.load_image(image_id)
         #If error in inferring the image, check the encoding and make sure it is 16 bits
-        image = dataset.load_image(image_id) *16
+        image = dataset.load_image(image_id) *8
         # Detect objects
         r = model.detect([image], verbose=0)[0]
         # Encode image to RLE. Returns a string of multiple lines
@@ -287,7 +288,8 @@ def postprocess(data_dir, out_dir):
 
 
 #define the folder path to data for prediction
-data_dir = 'cus_data_copy/' #don't forget the / at the end
+data_dir = 'hela_sliced/' #don't forget the / at the end
+save_dir = 'hela_results/'
 #model_path = '/home/davince/Dropbox (OIST)/Deeplearning_system/Mask-RCNN_OIST/trainednetwork/mask_rcnn_nuclei_res101.h5'
 
 #define the model weight paths
@@ -303,14 +305,14 @@ model_list = [model_path_1, model_path_2, model_path_3]
 all_files = []
 sub_directory = []
 for root, dirs, files in os.walk(data_dir):
-	for file in files:
-		relativePath = os.path.relpath(root, data_dir)
-		if relativePath == ".":
-			relativePath = ""
-		all_files.append((relativePath.count(os.path.sep),relativePath, file))
+    for file in files:
+        relativePath = os.path.relpath(root, data_dir)
+        if relativePath == ".":
+            relativePath = ""
+        all_files.append((relativePath.count(os.path.sep),relativePath, file))
 all_files.sort(reverse=True)
 for (count, folder), files in groupby(all_files, itemgetter(0, 1)):
-	sub_directory.append(folder)
+    sub_directory.append(folder)
 print(sub_directory)
 
 config = CellInferenceConfig()
@@ -326,45 +328,45 @@ sys.stdout = Logger()
 total_start = time.time()
 run_time_log = []
 for i in sub_directory:
-	counter = 1
-	start = time.time()
-	mask_duplicate_dir = os.path.join(data_dir, i+'_mask')
-	for m in model_list:
-		#print(m)
-		print('>Loading model from: ', m)
-		model.load_weights(m, by_name=True)
-		try:
-			predict_location = os.path.join(data_dir, i)
-			print('prediction for: ', predict_location)
-			print('model run '+str(counter)+' of '+str(len(model_list)))
-			try:
-				out_dir= os.path.join(mask_duplicate_dir, "_"+str(counter))
-				os.makedirs(out_dir)
-			except:
-				print('failed to create mask folder')
-			#print('out_dir is'+out_dir)
-			try:
-				detect(model, predict_location, out_dir)
-			except:
-				print('failed to deploy the inference, skipping...')
-		except:
-			print('error, skipping...')
-		counter += 1
-	try:
-		avg_prediction_dir = os.path.join(data_dir, i+"_mask_avg")
-		os.makedirs(avg_prediction_dir)
-	except:
-		print('failed to create avg mask folder')
-	postprocess(mask_duplicate_dir, avg_prediction_dir)
-	end = time.time()
-	time_diff = end-start
-	run_time_log.append(time_diff)
-	hour = time_diff // 3600
-	time_diff %= 3600
-	minutes = time_diff // 60
-	time_diff %= 60
-	seconds = time_diff
-	print('prediction run time = %d hr: %d min: %d s'%(hour, minutes, seconds))
+    counter = 1
+    start = time.time()
+    mask_duplicate_dir = os.path.join(save_dir, i+'_mask')
+    for m in model_list:
+        #print(m)
+        print('>Loading model from: ', m)
+        model.load_weights(m, by_name=True)
+        try:
+            predict_location = os.path.join(data_dir, i)
+            print('prediction for: ', predict_location)
+            print('model run '+str(counter)+' of '+str(len(model_list)))
+            try:
+                out_dir= os.path.join(mask_duplicate_dir, "_"+str(counter))
+                os.makedirs(out_dir)
+            except:
+                print('failed to create mask folder')
+            #print('out_dir is'+out_dir)
+            try:
+                detect(model, predict_location, out_dir)
+            except:
+                print('failed to deploy the inference, skipping...')
+        except:
+            print('error, skipping...')
+        counter += 1
+    try:
+        avg_prediction_dir = os.path.join(save_dir, i+"_mask_avg")
+        os.makedirs(avg_prediction_dir)
+    except:
+        print('failed to create avg mask folder')
+    postprocess(mask_duplicate_dir, avg_prediction_dir)
+    end = time.time()
+    time_diff = end-start
+    run_time_log.append(time_diff)
+    hour = time_diff // 3600
+    time_diff %= 3600
+    minutes = time_diff // 60
+    time_diff %= 60
+    seconds = time_diff
+    print('prediction run time = %d hr: %d min: %d s'%(hour, minutes, seconds))
 print(run_time_log)
 runtimelogfile=open('exptime.txt', 'w')
 for item in run_time_log:
