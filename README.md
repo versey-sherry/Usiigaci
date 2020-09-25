@@ -312,7 +312,7 @@ pip install keras==2.1.5
 *voila* there you should have a working environment for usiigaci on the linux 
 try it out with the inference script
 
-#### Conda Installation from Environment.yml (Recommended)
+### Conda Installation from Environment.yml (Recommended)
 
 You can creating an conda environment from an ``environment.yml`` file
 ```
@@ -361,7 +361,7 @@ conda env list
 
 ### Segmentation using Mask R-CNN
 
-1. Download the trained weights
+0. Download the trained weights
 	
 	Due to the file size limit of Github, please download the three weights we used for our phase contrast microscope in the [Dropbox folder](https://www.dropbox.com/sh/3eldgvytfchm9gr/AAB6vzPaEf8buk81IRVNClUEa?dl=0).
 
@@ -397,6 +397,8 @@ conda env list
 	the keras and tensorflow should take care of looking for the main GPU and run the inference. 
 
 4. instance-aware mask images will saved in a mask folder be right next to the folder you defined and you can use it to run in Lineage Mapper or etc.
+
+If at least one model fail to run, please check the range of the values in the image. If the values are not between 0 and 65535, please normalize your images to match the range.
 
 ### Data verification/tracking
 
