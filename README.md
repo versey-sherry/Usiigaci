@@ -173,9 +173,9 @@ We see a high efficiency on running Usiigaci in a linux machine.
 * Kubuntu 16.04 Linux
 * NVIDIA graphics card with compute capability > 5.0
 * CUDA ~~9.1~~ 9.0
-* TensorFlow ~~1.4~~ 1.7 with GPU
+* TensorFlow ~~1.4~~ 1.5 with GPU
 * Keras ~~2.1.2~~ 2.1.5
-* Anaconda with Python 3.6 
+* Anaconda with Python 3.5 
 
 note: multiple GPU not working
 
@@ -312,6 +312,22 @@ pip install keras==2.1.5
 *voila* there you should have a working environment for usiigaci on the linux 
 try it out with the inference script
 
+#### Conda Installation from Environment.yml (Recommended)
+
+You can creating an conda environment from an ``environment.yml`` file
+```
+conda env create -f environment.yml
+```
+The first line of the ``yml`` file sets the new environment's name. For more details see [Conda Documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
+
+Activate the new environment
+```
+conda activate Usiigaci
+```
+Verify the new environment
+```
+conda env list
+```
 
 ### Python tracking GUI
 * Python 3.4+
