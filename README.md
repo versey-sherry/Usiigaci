@@ -378,15 +378,17 @@ conda env list
 
 2. edit the inference.py script
 
-	line 288 change the path to the folder you want to run inference. 
+	line 291 change the path to the folder you want to run inference. 
+	
+	line 292 change the path to the folder you want to save the mask results.
 
 	The script will automatically search all th nested directories of this folder and run inference on each of them.
 
-	line 292:294 change the path to the trained weights. 
+	line 296:298 change the path to the trained weights. 
 
 	you can specify multiple weights from different training, the inference code will run predictions using each model weight and average them. This costs more time to do inference. But since all neural networks can have false negatives (blinking), this can alleviate the false result frequency.
 
-	line 296 adjust the model_list by the model_path you define.
+	line 300 adjust the model_list by the model_path you define.
 
 
 3. run the inference.py script.
